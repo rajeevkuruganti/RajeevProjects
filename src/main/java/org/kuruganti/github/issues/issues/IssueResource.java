@@ -22,7 +22,6 @@ public class IssueResource {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Issue> getIssues(@PathParam("list") String userRepos) {
-		System.out.println(userRepos);
 		List<Issue> issues = service.getGitIssues(userRepos);
 		return issues;
 
@@ -35,7 +34,6 @@ public class IssueResource {
 	
 		String[] userRepository = userRepos.split(",");
 		for (int k = 0; k < userRepository.length; k++) {
-			System.out.println(userRepository[k]);
 			issues.addAll( service.getGitIssues(userRepository[k]));
 		}
 
