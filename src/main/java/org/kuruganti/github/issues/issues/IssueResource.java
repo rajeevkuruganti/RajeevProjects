@@ -25,7 +25,10 @@ public class IssueResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Issue> getIssuesForAllusers(@QueryParam("userRepos") List<String> userRepos) throws ParseException {		
 		for (int k = 0; k < userRepos.size(); k++) {
-			issues.addAll( service.getGitIssues(userRepos.get(k)));
+			List<Issue> issuesRepos=service.getGitIssues(userRepos.get(k));
+			if (issuesRepos != null) {
+				issues.addAll( issuesRepos);
+			}
 		}
 		JsonObject x = IssueHelper.getTopDay(issues);
 

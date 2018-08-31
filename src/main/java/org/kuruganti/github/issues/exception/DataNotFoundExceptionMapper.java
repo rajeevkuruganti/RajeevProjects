@@ -13,7 +13,9 @@ public class DataNotFoundExceptionMapper implements ExceptionMapper<DataNotFound
 	@Override
 	public Response toResponse(DataNotFoundException exp) {
 		ErrorMessage errorMessage= new ErrorMessage (404,exp.getMessage(), "I am throwing this message");
-		return Response.status(Status.NOT_FOUND).entity(errorMessage).build();
+		return Response.status(Status.NOT_FOUND)
+				.entity(errorMessage)
+				.build();
 	}
 	
 

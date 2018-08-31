@@ -11,6 +11,7 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.kuruganti.github.issues.issues.helper.IssueHelper;
 import org.kuruganti.github.issues.issues.model.Issue;
@@ -24,6 +25,10 @@ public class IssueService {
 
 	public List<Issue> getGitIssues(String userRepos) throws ParseException {
 		Response response = connectAndGetResponse(userRepos);
+		if (response.getStatus()==404) {
+			logger.info(userRepos + " not found!");
+			return null;
+		}
 		Issue[] issues = response.readEntity(Issue[].class);
 		List<Issue> listIssues = new ArrayList<>();
 		for (int j = 0; j < issues.length; j++) {
