@@ -3,6 +3,7 @@
  */
 package org.kuruganti.github.issues.issues.model;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -15,6 +16,16 @@ public class Issue {
     private String title;
     private String repository;
     private Date created_at;
+    public Issue() {
+    	
+    }
+    public Issue(long id, Date created_at,String state,String title, String repository) {
+    	this.id = id;
+    	this.created_at = created_at;
+    	this.state= state;
+    	this.title = title;
+    	this.repository = repository;
+    }
 	public long getId() {
 		return id;
 	}
