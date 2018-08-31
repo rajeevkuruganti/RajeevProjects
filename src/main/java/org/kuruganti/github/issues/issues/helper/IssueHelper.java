@@ -12,6 +12,7 @@ import org.kuruganti.util.DateUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class IssueHelper {
@@ -32,16 +33,13 @@ public class IssueHelper {
 		sortedDates.putAll(topDay);
 		Map.Entry<LocalDate, Integer> maxDate = sortedDates.entrySet().stream()
 				.max(Map.Entry.comparingByKey(LocalDate::compareTo)).get();
-		JsonObject y = getRepoCountForDate(listIssues, maxDate.getKey());
+		JsonObject repoCounts = getRepoCountForDate(listIssues, maxDate.getKey());
 		Gson gson = new Gson();
 
 		JsonObject finalObj = new JsonObject();
-		JsonArray issueJson = new JsonArray();
-		issueJson.add(gson.toJson(listIssues));
-
-		finalObj.add("issues", issueJson);
-		finalObj.add("top_Day", y);
-
+		JsonElement elem = gson.toJsonTree(listIssues);		
+		finalObj.add("issues", elem);
+		finalObj.add("top_Day", repoCounts);
 		return finalObj;
 
 	}
@@ -67,13 +65,11 @@ public class IssueHelper {
 		}
 		Map<String, Integer> sortedRepos = new TreeMap<>();
 		sortedRepos.putAll(topRepos);
-
 		Gson gson = new Gson();
 		JsonObject topJsonObj = new JsonObject();
-		JsonArray jsonArray = new JsonArray();
-		jsonArray.add(gson.toJson(sortedRepos));
+	    JsonElement element = gson.toJsonTree(sortedRepos);
 		topJsonObj.addProperty("day", topDayDate.toString());
-		topJsonObj.add("occurrences", jsonArray);
+		topJsonObj.add("occurrences", element);
 		return topJsonObj;
 	}
 
