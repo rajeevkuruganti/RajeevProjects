@@ -3,15 +3,16 @@ package org.kuruganti.github.issues.issues.helper;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.kuruganti.github.issues.issues.model.Issue;
 import org.kuruganti.util.DateUtils;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -29,11 +30,15 @@ public class IssueHelper {
 				topDay.put(topDayDate, total);
 			}
 		}
-		Map<LocalDate, Integer> sortedDates = new TreeMap<>();
-		sortedDates.putAll(topDay);
-		Map.Entry<LocalDate, Integer> maxDate = sortedDates.entrySet().stream()
-				.max(Map.Entry.comparingByKey(LocalDate::compareTo)).get();
-		JsonObject repoCounts = getRepoCountForDate(listIssues, maxDate.getKey());
+		LocalDate maxDate = getMaxDateForRepos(topDay); 
+		JsonObject repoCounts = getRepoCountForDate(listIssues, maxDate);
+		JsonObject jsonObjectAnswer = bundleJsonObject(listIssues,repoCounts);
+		
+		return jsonObjectAnswer;
+
+	}
+
+	private static JsonObject bundleJsonObject(List<Issue> listIssues, JsonObject repoCounts) {
 		Gson gson = new Gson();
 
 		JsonObject finalObj = new JsonObject();
@@ -41,7 +46,6 @@ public class IssueHelper {
 		finalObj.add("issues", elem);
 		finalObj.add("top_Day", repoCounts);
 		return finalObj;
-
 	}
 
 	public static JsonObject getRepoCountForDate(List<Issue> listIssues, LocalDate topDayDate) {
@@ -49,15 +53,13 @@ public class IssueHelper {
 		int sizeOfList = listIssues.size();
 		for (int i = 0; i < sizeOfList; i++) {
 			LocalDate theDate = DateUtils.getLocalDate(listIssues.get(i).getCreated_at().toString());
-			String repo = listIssues.get(i).getRepository().trim();
-			topRepos.put(repo, 0);
+			String repo = listIssues.get(i).getRepository().trim();		
 			if (topDayDate.equals(theDate)) {
 				if (topRepos.containsKey(repo)) {
 					int total = topRepos.get(repo) + 1;
-					topRepos.put(listIssues.get(i).getRepository(), total);
+					topRepos.put(repo, total);
 				} else {
 					topRepos.put(repo, 1);
-
 				}
 			} else {
 				topRepos.put(repo, 0);
@@ -72,5 +74,25 @@ public class IssueHelper {
 		topJsonObj.add("occurrences", element);
 		return topJsonObj;
 	}
+  public static LocalDate getMaxDateForRepos(Map topDay) throws ParseException{
+		Map.Entry<LocalDate,Integer> valueMap = (Entry<LocalDate, Integer>) topDay
+				.entrySet()
+				.stream()
+				.max(Map.Entry.comparingByValue(Integer::compareTo))
+				.get();
+		 Integer maxOccurs = valueMap.getValue();
+		 Map<LocalDate, Integer> maxOccursMap = new LinkedHashMap<LocalDate,Integer>();
+		 topDay.forEach((k, v) -> {
+			    if(v.equals(maxOccurs)) {
+			      maxOccursMap.put((LocalDate) k,(Integer) v);
+			    }
+	            
+	        });
+		 Map.Entry<LocalDate,Integer> maxDateOccurs= maxOccursMap.entrySet().stream()
+				 .max(Map.Entry.comparingByKey(LocalDate::compareTo)).get();
+		 
+		return maxDateOccurs.getKey();
+	
+  }
 
 }
